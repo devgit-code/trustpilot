@@ -1,0 +1,184 @@
+<%- include ("../layouts/header") %>
+
+<div class="content">
+    <div class="container">
+        <div class="page-title">
+            <h3>Edit Blog</h3>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-body">
+                <form style="display: contents;" onsubmit="doSave()" id="form-edit">
+                    <div class="row" style="margin-top: 50px;">
+                        <div class="offset-md-2 col-md-8">
+                            <div class="form-group">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="title" class="form-control" onkeyup="onkeyupTitle()" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Slug</label>
+                                <input type="text" name="slug" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Excerpt</label>
+                                <textarea name="excerpt" id="excerpt" class="form-control"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Content</label>
+                                <textarea name="content" id="content" class="form-control"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Featured image</label>
+                                <input type="file" name="featuredImage" accept="image/*, video/*" class="form-control" />
+
+                                <video controls id="featured-video" style="width: 200px; margin-top: 20px;"
+                                    onerror="this.remove()"></video>
+
+                                <img id="featured-image" style="width: 200px; margin-top: 20px;"
+                                    onerror="this.remove()"></video>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Categories</label>
+                                <select id="categories" multiple class="form-control"></select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-control" required>
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Publish</option>
+                                </select>
+                            </div>
+
+                            <input type="submit" name="submit" class="btn btn-warning" value="Update Post" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="_id" value="<%= _id %>" />
+
+<script>
+    const _id = document.getElementById("_id").value
+
+    function onkeyupTitle() {
+        const form = document.getElementById("form-edit")
+        const title = form.title.value
+        let slug = title.split(" ").join("-").toLowerCase()
+        form.slug.value = slug
+    }
+
+    async function doSave() {
+        event.preventDefault()
+        const categories = document.getElementById("categories").options
+
+        const selectedCategories = []
+        for (let a = 0; a < categories.length; a++) {
+            if (categories[a].selected) {
+                selectedCategories.push(categories[a].value)
+            }
+        }
+        
+        const form = event.target
+        const formData = new FormData(form)
+        formData.append("_id", _id)
+        formData.append("accessToken", localStorage.getItem("adminAccessToken"))
+        formData.append("categories", JSON.stringify(selectedCategories))
+        
+        document.getElementById("loader").style.display = ""
+        try {
+            const response = await axios.post(
+                "/admin/blogs/update",
+                formData
+            )
+            
+            if (response.data.status == "success") {
+                swal("Success", response.data.message, response.data.status)
+            } else {
+                swal("Error", response.data.message, response.data.status)
+            }
+        } catch (error) {
+            if (error?.response?.status == 401) {
+                swal("Error", error.response.data.message || "Unauthorized", "error")
+            }
+        } finally {
+            document.getElementById("loader").style.display = "none"
+        }
+    }
+
+    async function onInit() {
+        const formData = new FormData()
+        formData.append("_id", _id)
+        formData.append("accessToken", localStorage.getItem("adminAccessToken"))
+        
+        document.getElementById("loader").style.display = ""
+        try {
+            const response = await axios.post(
+                "/admin/blogs/fetchSingle",
+                formData
+            )
+            
+            if (response.data.status == "success") {
+                const data = response.data.data
+                const categories = response.data.categories
+                const form = document.getElementById("form-edit")
+
+                form.title.value = data.title
+                form.slug.value = data.slug
+                form.excerpt.value = data.excerpt
+                form.content.value = data.content
+                form.status.value = data.status
+
+                let extension = data.featuredImage
+                extension = extension.split(".")
+                extension = extension[extension.length - 1]
+                extension = extension.toLowerCase()
+
+                if (["jpg", "jpeg", "png", "heic"].includes(extension)) {
+                    document.getElementById("featured-image").setAttribute("src", data.featuredImage)
+                    document.getElementById("featured-video").remove()
+                } else {
+                    document.getElementById("featured-video").setAttribute("src", data.featuredImage)
+                    document.getElementById("featured-image").remove()
+                }
+
+                let categoriesHtml = ""
+                for (let a = 0; a < categories.length; a++) {
+                    let selected = false
+                    for (let b = 0; b < data.categories.length; b++) {
+                        if (data.categories[b] == categories[a]) {
+                            selected = true
+                            break
+                        }
+                    }
+                    categoriesHtml += `<option value="` + categories[a] + `" ` + (selected ? "selected" : "") + `>` + categories[a] + `</option>`
+                }
+                document.getElementById("categories").innerHTML = categoriesHtml
+
+                setTimeout(function () {
+                    $("#content").richText()
+                    $("#excerpt").richText()
+                }, 100)
+            } else {
+                swal("Error", response.data.message, response.data.status)
+            }
+        } catch (error) {
+            console.log(error)
+            if (error?.response?.status == 401) {
+                swal("Error", error.response.data.message || "Unauthorized", "error")
+            }
+        } finally {
+            document.getElementById("loader").style.display = "none"
+        }
+    }
+</script>
+
+<%- include ("../layouts/footer") %>

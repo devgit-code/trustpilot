@@ -1,0 +1,128 @@
+<%- include ("../layouts/header") %>
+
+<div class="content">
+    <div class="container">
+        <div class="page-title">
+            <h3>Edit User</h3>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-body">
+                <form style="display: contents;" onsubmit="doSave()" id="form-edit">
+                    <div class="row" style="margin-top: 50px;">
+                        <div class="offset-md-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Name</label>
+                                <input type="text" name="name" class="form-control" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" readonly class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+
+                                <textarea name="password" rows="1"
+                                    style="resize: none;
+                                        min-height: fit-content;
+                                        font-family: sans-serif;
+                                        font-size: 14px;"
+                                    class="form-control"
+                                    id="maskedPassword"></textarea>
+                                <input type="hidden" id="hiddenPassword" />
+                            </div>
+
+                            <input type="submit" name="submit" class="btn btn-warning" value="Update user" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="_id" value="<%= _id %>" />
+
+<script>
+    const _id = document.getElementById("_id").value
+
+    async function doSave() {
+        event.preventDefault()
+        
+        const form = event.target
+        const formData = new FormData(form)
+        formData.append("_id", _id)
+        formData.append("accessToken", localStorage.getItem("adminAccessToken"))
+        
+        document.getElementById("loader").style.display = ""
+        try {
+            const response = await axios.post(
+                "/admin/users/update",
+                formData
+            )
+            
+            if (response.data.status == "success") {
+                swal("Success", response.data.message, response.data.status)
+            } else {
+                swal("Error", response.data.message, response.data.status)
+            }
+        } catch (error) {
+            if (error?.response?.status == 401) {
+                swal("Error", error.response.data.message || "Unauthorized", "error")
+            }
+        } finally {
+            document.getElementById("loader").style.display = "none"
+        }
+    }
+
+    async function onInit() {
+        const formData = new FormData()
+        formData.append("_id", _id)
+        formData.append("accessToken", localStorage.getItem("adminAccessToken"))
+        
+        document.getElementById("loader").style.display = ""
+        try {
+            const response = await axios.post(
+                "/admin/users/fetchSingle",
+                formData
+            )
+            
+            if (response.data.status == "success") {
+                const data = response.data.data
+                const form = document.getElementById("form-edit")
+
+                form.name.value = data.name
+                form.email.value = data.email
+
+                const maskedPassword = document.getElementById('maskedPassword')
+                const hiddenPassword = document.getElementById('hiddenPassword')
+
+                maskedPassword.addEventListener('input', function (event) {
+                    const input = event.target.value
+                    
+                    // Prevent adding asterisks to the hidden input value
+                    if (input.length > hiddenPassword.value.length) {
+                        const newChar = input[input.length - 1]
+                        hiddenPassword.value += newChar
+                    } else {
+                        hiddenPassword.value = hiddenPassword.value.slice(0, input.length)
+                    }
+
+                    maskedPassword.value = '*'.repeat(input.length)
+                })
+            } else {
+                swal("Error", response.data.message, response.data.status)
+            }
+        } catch (error) {
+            if (error?.response?.status == 401) {
+                swal("Error", error.response.data.message || "Unauthorized", "error")
+            }
+        } finally {
+            document.getElementById("loader").style.display = "none"
+        }
+    }
+</script>
+
+<%- include ("../layouts/footer") %>

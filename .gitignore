@@ -1,0 +1,15 @@
+/administrator/vendor
+/administrator/img
+/trustpilot-server/vendor
+/trustpilot-server/public
+/trustpilot-server/storage
+/trustpilot-server/node/admin/assets/vendor
+/trustpilot-server/node/admin/assets/img
+/trustpilot-server/node/admin/assets/font
+/trustpilot-server/node/admin/img
+/trustpilot-server/.env
+/trustpilot-server/bootstrap/cache
+/img
+/fonts
+/ckeditor/plugins
+/ckeditor/lang

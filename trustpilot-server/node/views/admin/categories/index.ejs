@@ -1,0 +1,147 @@
+<%- include ("../layouts/header") %>
+
+<div class="content">
+    <div class="container">
+        <div class="page-title">
+            <h3>Categories</h3>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-body">
+
+                <a href="/admin/categories/add" class="btn btn-sm btn-outline-primary float-right"><i class="fas fa-plus"></i> Add</a>
+
+                <table width="100%" class="table table-bordered" id="dataTables-categories" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+                </table>
+
+                <nav>
+                    <ul id="pagination" class="pagination"></ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const urlSearchParams = new URLSearchParams(window.location.search)
+    let page = urlSearchParams.get("page") || 1
+
+    function onInit() {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/admin/fetchCategories", true);
+        document.getElementById("loader").style.display = ""
+
+        ajax.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    // console.log(this.responseText);
+                    var response = JSON.parse(this.responseText);
+                    // console.log(response);
+                    document.getElementById("loader").style.display = "none"
+
+                    if (response.status == "success") {
+                        var html = "";
+                        for (var a = 0; a < response.data.length; a++) {
+                            var d = response.data[a];
+
+                            html += `<tr data-category-id="` + d._id + `">
+                                <td><a href="/category/` + d._id + `">` + d.category + `</a></td>
+                                <td>
+                                    <a class="btn btn-warning btn-sm" href="/admin/categories/edit/` + d._id + `">Edit</a>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteCategory('` + d._id + `')">Delete</button>
+                                </td>
+                            </tr>`
+                        }
+                        document.querySelector("#dataTables-categories tbody").innerHTML = html;
+
+                        if (response.pages > 1) {
+                            var html = "";
+                            for (var a = 1; a <= response.pages; a++) {
+                                html += `<li class="page-item ` + (a == page ? "active" : "") + `">
+                                    <a class="page-link" href="javascript:void(0);" onclick="paginate(` + a + `);">
+                                        ` + a + `
+                                    </a>
+                                </li>`;
+                            }
+                            document.getElementById("pagination").innerHTML = html;
+                        }
+                    } else {
+                        swal("Error", response.message, "error");
+                    }
+                }
+
+                if (this.status == 500) {
+                    console.log(this.responseText);
+                }
+            }
+        };
+
+        var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("adminAccessToken"));
+        formData.append("page", page)
+        ajax.send(formData);
+    }
+
+    function paginate(p) {
+        page = p
+        onInit()
+    }
+
+    function deleteCategory(_id) {
+        const node = event.target
+
+        swal({
+            title: "Delete category",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then(function (isOkay) {
+            if (isOkay) {
+                const ajax = new XMLHttpRequest();
+                ajax.open("POST", "/admin/deleteCategory", true)
+
+                node.setAttribute("disabled", "disabled")
+
+                ajax.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+
+                            node.removeAttribute("disabled")
+
+                            // console.log(this.responseText);
+                            var response = JSON.parse(this.responseText);
+
+                            if (response.status == "success") {
+                                document.querySelector("tr[data-category-id='" + _id + "']").remove()
+                            } else {
+                                swal("Error", response.message, "error");
+                            }
+                        }
+
+                        if (this.status == 500) {
+                            console.log(this.responseText);
+                        }
+                    }
+                };
+
+                var formData = new FormData();
+                formData.append("accessToken", localStorage.getItem("adminAccessToken"));
+                formData.append("_id", _id)
+                ajax.send(formData);
+            }
+        })
+    }
+</script>
+
+<%- include ("../layouts/footer") %>

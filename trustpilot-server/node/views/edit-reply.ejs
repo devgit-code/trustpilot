@@ -1,0 +1,216 @@
+<%- include ("layouts/header") %>
+
+    <input type="hidden" id="reply-id" value="<%= _id %>" />
+
+    <div style="padding-top: 50px; padding-bottom: 50px; background-color: #fcfbf3;">
+        <div style="display: contents;" id="editReviewApp">
+
+            <div class="container">
+                <div class="row" v-if="isLoading" style="padding: 25px;">
+                    <div class="col-md-12" style="text-align: center;">
+                        <div class="spinner-border">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (review == null) { %>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="text-center" style="font-size: 20px;
+                                font-weight: bold;">Review not found.</p>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <% if (review != null) { %>
+                <div class="container" style="margin-top: 20px; margin-bottom: 20px;">
+
+                    <div class="row">
+                        <div class="offset-md-3 col-md-1">
+                            <img src="<%= screenshot %>" class="screenshot" style="width: 100%; object-fit: cover"
+                                onerror="this.src = '/public/img/placeholder-image.png'" />
+                        </div>
+
+                        <div class="col-md-5">
+                            <p style="font-weight: bold; margin-bottom: 0px;"><%= review.company.title || review.company.domain %></p>
+                            <p><%= review.company.domain %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding-top: 20px; padding-bottom: 50px; background-color: #fcfbf3;">
+                    <div class="container">
+                        <div class="row">
+                            <div class="offset-md-3 col-md-6">
+                                <div class="card card-body" style="padding: 0px 25px;">
+                                    <form v-on:submit.prevent="editReply" enctype="multipart/form-data">
+                                        <h3>Edit your reply</h3>
+
+                                        <h4 style="margin-top: 30px;">Title</h4>
+                                        <input type="text" style="padding-top: 25px; padding-bottom: 25px;" value="<%= review.title %>" name="title" disabled class="form-control" />
+
+                                        <h4 style="margin-top: 30px;">Review</h4>
+                                        <textarea value="<%= review.review %>" name="review" class="form-control" rows="10" disabled></textarea>
+
+                                        <!-- <% if (review.images?.length > 0) { %>
+                                            <div style="margin-top: 50px;">
+                                                <h5>Images</h5>
+                                                <% review.images.forEach(function (image) { %>
+                                                    <img src="<%= image %>" style="width: 150px; margin-right: 5px; margin-top: 5px;" />
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+                                        
+                                        <% if (review.videos?.length > 0) { %>
+                                            <div>
+                                                <h5>Videos</h5>
+                                                <% review.videos.forEach(function (video) { %>
+                                                    <video src="<%= video %>" style="width: 300px; margin-right: 5px; margin-top: 5px;" controls></video>
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+
+                                        <h4 style="margin-top: 30px;">Date of experience</h4>
+                                        <input type="date" name="dateOfExperience" id="dateOfExperience" class="form-control" disabled value="<%= review.dateOfExperience %>" /> -->
+
+                                        <div class="form-group" style="margin-top: 30px;">
+                                            <label>My reply</label>
+                                            <textarea value="<%= reply.reply %>" id="reply" class="form-control" rows="10" required></textarea>
+                                        </div>
+
+                                        <button type="submit" name="submit" class="btn btn-primary btn-block"
+                                            id="btn-submit-review"
+                                            v-bind:disabled="submitting"
+                                            v-text="submitting ? 'Updating...' : 'Edit Reply'"
+                                            style="margin-top: 20px;"></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        const _id = document.getElementById("reply-id").value
+        let reviewDetailApp = null
+
+        function initReviewDetailApp() {
+            reviewDetailApp = Vue.createApp({
+
+                components: {
+                    ReviewComponent
+                },
+
+                data() {
+                    return {
+                        isLoading: false,
+                        review: null,
+                        _id: _id,
+                        profileImage: "",
+                        user: null,
+                        mainURL: mainURL,
+                        getStarColor: getStarColor,
+                        getDateFormat: getDateFormat,
+                        onmouseenterStar: onmouseenterStar,
+                        selectedStar: 0
+                    }
+                },
+
+                methods: {
+
+                    async editReply() {
+                        const form = event.target
+
+                        form.submit.setAttribute("disabled", "disabled")
+                        const originalHtml = form.submit.innerHTML
+                        form.submit.innerHTML = "Loading..."
+
+                        try {
+                            const formData = new FormData(form)
+                            formData.append("_id", this._id)
+
+                            const reply = CKEDITOR.instances.reply.getData()
+                            formData.append("reply", reply)
+
+                            const response = await axios.post(
+                                mainURL + "/editReply",
+                                formData,
+                                {
+                                    headers: {
+                                        "Authorization": "Bearer: " + localStorage.getItem("accessToken") 
+                                    }
+                                }
+                            )
+
+                            if (response.data.status == "success") {
+                                swal.fire("Edit reply", response.data.message, "success") 
+                            } else {
+                                swal.fire("Error", response.data.message, "error")
+                            }
+                        } catch (exp) {
+                            swal.fire("Error", exp.message, "error")
+                        } finally {
+                            form.submit.removeAttribute("disabled")
+                            form.submit.innerHTML = originalHtml
+                        }
+                    },
+
+                    onProfileError() {
+                        this.profileImage = '/public/img/user-placeholder.png'
+                    }
+                },
+
+                mounted() {
+                    setTimeout(function () {
+                        CKEDITOR.replace("reply")
+                    }, 500)
+                },
+
+                watch: {
+                    user(to, from) {
+                        if (to != null) {
+                            this.profileImage = to.profileImage
+                        }
+                    }
+                }
+            }).mount("#editReviewApp")
+        }
+
+        initReviewDetailApp()
+    </script>
+
+    <style>
+        /* for mobile  */
+        @media only screen and (max-width: 767px) {
+            .screenshot {
+                height: 200px;
+            }
+        }
+        /* for desktop  */
+        @media only screen and (min-width: 768px) {
+            .screenshot {
+                height: 50px;
+            }
+            .review {
+                padding-left: 0px;
+            }
+        }
+        #btn-delete span,
+        #btn-edit span {
+            margin-left: 5px;
+        }
+        #btn-delete,
+        #btn-edit {
+            color: gray;
+            text-decoration: none;
+            border: none;
+            background: none;
+        }
+    </style>
+
+<%- include ("layouts/footer") %>
