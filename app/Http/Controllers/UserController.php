@@ -441,7 +441,7 @@ class UserController extends Controller
                 "id" => $user->id,
                 "name" => $user->name ?? "",
                 "email" => $user->email ?? "",
-                "profile_image" => ($user->profile_image && Storage::exists("public/" . $user->profile_image)) ? url("/storage/" . $user->profile_image) : ""
+                "profile_image" => ($user->profile_image && Storage::exists("public/profile/" . $user->profile_image)) ? url("/storage/profile/" . $user->profile_image) : ""
             ],
             "new_messages" => $new_messages
         ]);

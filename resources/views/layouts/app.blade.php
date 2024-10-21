@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="{{ asset('/css/bootstrap.css') }}" />
         <!-- <link rel="stylesheet" href="{{ asset('/css/fontawesome.css') }}" /> -->
         <link rel="stylesheet" href="{{ asset('/css/style.css') }}" />
-		<link rel="icon" type="image/ico" href="img/favicon.ico">		
+		<link rel="icon" type="image/ico" href="{{ asset('/img/favicon.ico') }}">		
         <script src="{{ asset('/js/jquery.js') }}"></script>
         <script src="{{ asset('/js/bootstrap.js') }}"></script>
         <script src="{{ asset('/ckeditor/ckeditor.js') }}"></script>
@@ -56,10 +56,10 @@
                       <ul>
                           <li class="nav-item dropdown" v-if="user != null">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img v-bind:src="user.profileImage ?? ''" style="width: 40px; height: 40px;
+                                <img v-bind:src="user.profile_image ? user.profile_image : 'img/default-user.png'" style="width: 40px; height: 40px;
                                     object-fit: cover; border-radius: 50%; margin-right: 10px;" />
 
-                                <span v-text="user.name"></span>
+                                <!-- <span v-text="user.name"></span> -->
                             </a>
                             <ul class="dropdown-menu">
                               <li><a class="dropdown-item" href="/profile">Profile</a></li>
@@ -103,8 +103,8 @@
                             if (response.data.status == "success") {
                                 // remove access token from local storage
                                 localStorage.removeItem(accessTokenKey)
-                                // window.location.href = "/login"
-                                window.location.reload()
+                                window.location.href = "/"
+                                // window.location.reload()
                             } else {
                                 swal.fire("Error", response.data.message, "error")
                             }
@@ -327,7 +327,7 @@
 
                         if (response.data.status == "success") {
                             window.user = response.data.user
-                            console.log("here", window.user)
+                            // console.log("here", window.user)
                             const newMessages = response.data.new_messages
 
                 //             if (newMessages > 0) {

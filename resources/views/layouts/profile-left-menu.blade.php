@@ -1,6 +1,6 @@
 <ul class="list-group profile-left-menu">
     <li class="list-group-item">
-        <a href="{{ url('/profile') }}">Profil</a>
+        <a href="{{ url('/profile') }}">My Profile</a>
     </li>
 
     <li class="list-group-item">
