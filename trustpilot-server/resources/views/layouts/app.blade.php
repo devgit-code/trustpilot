@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>@yield("title", "Eniyi.co")</title>
 
-        <link rel="stylesheet" href="{{ asset('/css/all.css') }}" />
+        <!-- <link rel="stylesheet" href="{{ asset('/css/all.css') }}" /> -->
         <link rel="stylesheet" href="{{ asset('/css/bootstrap.css') }}" />
         <!-- <link rel="stylesheet" href="{{ asset('/css/fontawesome.css') }}" /> -->
         <link rel="stylesheet" href="{{ asset('/css/style.css') }}" />
@@ -37,13 +37,13 @@
         <nav class="navbar navbar-expand-lg navbar-light navbar-inverse" id="headerApp">
           <div class="container-fluid">
 		  
-            <a class="navbar-brand" href="{{ url('/') }}"><img alt="Eniyi.co logo" width="151" height="35" src="img/eniyi-logo-b.png"></a>
+            <a class="navbar-brand d-flex align-items-center " href="{{ url('/') }}"><img alt="Eniyi.co logo" width="151" height="35" src="{{ asset('/img/eniyi-logo-b.png')}}"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
                 style="background-color: white;">
               <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 pull-right">
                 <li class="nav-item" v-if="user == null">
                     <a v-bind:class="'nav-link' + (path == '/login' ? ' active' : '')" href="{{ url('/login') }}">Login</a>
                   </li>
@@ -91,11 +91,11 @@
 
                       async doLogout () {
                             const response = await axios.post(
-                                baseUrl + "/logout",
+                                baseUrl + "/api/logout",
                                 null,
                                 {
                                   headers: {
-                                    Authorization: "Bearer: " + localStorage.getItem(accessTokenKey)
+                                    Authorization: "Bearer " + localStorage.getItem(accessTokenKey)
                                   }
                                 }
                             )
@@ -129,6 +129,9 @@
             #headerApp .nav-link,
             #headerApp .navbar-brand {
                 color: white !important;
+            }
+            #headerApp .navbar-brand {
+                padding: 0;
             }
             /* for mobile */
             @media only screen and (max-width: 767px) {
@@ -324,11 +327,13 @@
 
                         if (response.data.status == "success") {
                             window.user = response.data.user
+                            console.log("here", window.user)
                             const newMessages = response.data.new_messages
 
-                            if (newMessages > 0) {
-                                document.getElementById("message-notification-badge").innerHTML = newMessages
-                            }
+                //             if (newMessages > 0) {
+                // console.log("here====", document.getElementById("message-notification-badge"))
+                //                 document.getElementById("message-notification-badge").innerHTML = newMessages
+                //             }
 
                             if (typeof initApp !== "undefined") {
                                 initApp()
@@ -350,7 +355,7 @@
                                 reviewDetailApp.user = user
                             }
                         } else {
-                            // swal.fire("Error", response.data.message, "error")
+                            swal.fire("Error", response.data.message, "error")
                         }
                     } catch (exp) {
                         console.log(exp)

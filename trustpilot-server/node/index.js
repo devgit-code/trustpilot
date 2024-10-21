@@ -810,6 +810,7 @@ http.listen(port, function () {
                 return
             }
          
+         console.log("ehrere id s")
             // check if email exists
             const user = await db.collection("users").findOne({
                 email: email
@@ -843,7 +844,7 @@ http.listen(port, function () {
                     userId: user._id.toString(),
                     time: new Date().getTime()
                 }, jwtSecret, {
-                    expiresIn: (60 * 60 * 24 * 30) // 30 days
+                    expiresIn: (60 * 60 * 24) // 1 days
                 })
      
                 // update JWT of user in database
