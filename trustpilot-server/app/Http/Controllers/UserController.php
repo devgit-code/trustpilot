@@ -344,7 +344,6 @@ class UserController extends Controller
     public function logout()
     {
         $user = auth()->user();
-
         // $user->tokens()->delete();
 
         $user->currentAccessToken()->delete();
@@ -361,7 +360,8 @@ class UserController extends Controller
     public function me()
     {
         $user = auth()->user();
-        $user->profile_image = url("/storage/" . $user->profile_image);
+        
+        // $user->profile_image = url("/storage/" . $user->profile_image);
 
         $client_ip = $_SERVER['REMOTE_ADDR'];
         // $client_ip = "223.123.88.250";
