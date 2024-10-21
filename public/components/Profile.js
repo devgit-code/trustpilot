@@ -9,6 +9,7 @@ function Profile() {
     React.useEffect(function () {
         globalState.listen(function (newState) {
             setState(newState)
+            console.log("here+++", globalState)
 
             if (newState.user != null) {
                 setName(newState.user.name)
@@ -60,12 +61,12 @@ function Profile() {
                         width: "100px",
                         height: "100px",
                         objectFit: "cover",
-                        borderRadius: "50%",
+                        borderRadius: "5%",
                         marginBottom: "20px",
                         position: "relative",
                         left: "50%",
                         transform: "translateX(-50%)"
-                    }} src={ profileImage } />
+                    }} src={ profileImage ? profileImage : 'img/default-user.png'} />
 
                     <input type="file" name="profile_image" accept="image/*" />
                 </div>

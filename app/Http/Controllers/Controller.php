@@ -80,15 +80,15 @@ abstract class Controller
             //Server settings
             $mail->SMTPDebug = 0; // SMTP::DEBUG_SERVER;                      //Enable verbose debug output
             $mail->isSMTP();                                            //Send using SMTP
-            $mail->Host       = $settings_obj->smtp_host;                     //Set the SMTP server to send through
+            $mail->Host       = env('MAIL_HOST');                     //Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-            $mail->Username   = $settings_obj->smtp_username;                     //SMTP username
-            $mail->Password   = $settings_obj->smtp_password;                               //SMTP password
+            $mail->Username   = env('MAIL_USERNAME');                     //SMTP username
+            $mail->Password   = env('MAIL_PASSWORD');                               //SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-            $mail->Port       = $settings_obj->smtp_port;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+            $mail->Port       = env('MAIL_PORT');                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
             //Recipients
-            $mail->setFrom($settings_obj->smtp_from, $settings_obj->smtp_from_name);
+            $mail->setFrom(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
             $mail->addAddress($to, $to_name);     //Add a recipient
 
             //Content

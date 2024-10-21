@@ -83,7 +83,6 @@
 
   <script type="text/babel">
     function Header() {
-
       const [state, setState] = React.useState(globalState.state)
 
       globalState.listen(function (newState) {
