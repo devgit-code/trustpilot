@@ -66,7 +66,7 @@ function Profile() {
                         position: "relative",
                         left: "50%",
                         transform: "translateX(-50%)"
-                    }} src={ profileImage ? profileImage : 'img/default-user.png'} />
+                    }} src={ profileImage ? profileImage : 'img/user-profile.png'} />
 
                     <input type="file" name="profile_image" accept="image/*" />
                 </div>

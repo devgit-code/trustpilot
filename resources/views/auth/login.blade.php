@@ -10,6 +10,7 @@
                 <h2 style="margin-bottom: 30px;">Login</h2>
 
                 <form method="POST" enctype="multipart/form-data" onsubmit="doLogin()">
+                    @csrf
                     <div class="form-group" style="margin-top: 20px; margin-bottom: 20px;">
                         <label>Enter email</label>
                         <input type="email" name="email" class="form-control" required />

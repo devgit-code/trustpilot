@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content="{{ csrf_token() }}"> 
         <title>@yield("title", "Eniyi.co")</title>
 
         <!-- <link rel="stylesheet" href="{{ asset('/css/all.css') }}" /> -->
@@ -78,6 +79,7 @@
         <script>
             let headerApp = null
             function initHeaderApp() {
+                console.log("initheaderapp")
                 headerApp = Vue.createApp({
 
                     data() {
@@ -312,6 +314,8 @@
 
         <script>
             async function onInit() {
+                console.log("onInit")
+
                 const accessToken = localStorage.getItem(accessTokenKey)
                 if (accessToken) {
                     try {
@@ -320,7 +324,7 @@
                             null,
                             {
                                 headers: {
-                                    Authorization: "Bearer " + accessToken
+                                    Authorization: "Bearer " + accessToken,
                                 }
                             }
                         )
