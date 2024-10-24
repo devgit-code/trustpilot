@@ -12,7 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // $middleware->redirectGuestsTo(fn () => url(env('APP_URL').'/login'));
+
+        // $middleware->statefulApi();
+        // $middleware->throttleApi();
+
+        $middleware->alias([
+            'apply_locale' => \App\Http\Middleware\ApplyLocale::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'auth' => \App\Http\Middleware\Authenticate::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

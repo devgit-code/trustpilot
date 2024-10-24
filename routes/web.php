@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -55,9 +54,9 @@ Route::get("/admin", function () {
 });
 
 
-Route::group([
-    "middleware" => ["guard"]
-], function () {
+// Route::group([
+//     "middleware" => ["guard"]
+// ], function () {
     Route::get("/email-verification/{email}", function () {
         return view("auth.email-verification", [
             "email" => request()->email
@@ -82,19 +81,19 @@ Route::group([
 
     Route::get("/login", function () {
         return view("auth.login");
-    });
+    })->name('login');
 
     Route::get("/register", function () {
         return view("auth.register");
     });
-});
+// });
 
 
 Route::get("/profile", function () {
     return view("profile");
 });
 
-Route::get("/", [UserController::class, "home"]);
+Route::get("/", [UserController::class, "home"])->name('home');
 
 // Route::get('/', function () {
 //     return view('welcome');

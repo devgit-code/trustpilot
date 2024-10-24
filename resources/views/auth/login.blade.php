@@ -56,6 +56,8 @@
                 // swal.fire("Login", response.data.message, "success")
                 localStorage.setItem(accessTokenKey, response.data.access_token)
                 window.location.href = baseUrl
+                
+                console.log('login+++')
             } else {
                 swal.fire("Error", response.data.message, "error")
             }

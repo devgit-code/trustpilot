@@ -30,7 +30,7 @@
 
     	<script>
     		const baseUrl = document.getElementById("baseUrl").value
-    		const appName = document.getElementById("appName").value    		
+    		const appName = document.getElementById("appName").value
     	</script>
         
         <script src="{{ asset('/js/script.js?v=' . time()) }}"></script>
@@ -79,7 +79,6 @@
         <script>
             let headerApp = null
             function initHeaderApp() {
-                console.log("initheaderapp")
                 headerApp = Vue.createApp({
 
                     data() {
@@ -105,6 +104,10 @@
                             if (response.data.status == "success") {
                                 // remove access token from local storage
                                 localStorage.removeItem(accessTokenKey)
+
+                                globalState.setState({
+                                    user: null
+                                })
                                 window.location.href = "/"
                                 // window.location.reload()
                             } else {
@@ -312,10 +315,8 @@
         <script type="text/babel" src="{{ asset('/components/Chat.js?v=' . time()) }}"></script>
         <link rel="stylesheet" href="{{ asset('/css/chat.css') }}" />
 
-        <script>
+        <script defer>
             async function onInit() {
-                console.log("onInit")
-
                 const accessToken = localStorage.getItem(accessTokenKey)
                 if (accessToken) {
                     try {
@@ -331,7 +332,11 @@
 
                         if (response.data.status == "success") {
                             window.user = response.data.user
-                            // console.log("here", window.user)
+
+                            globalState.setState({
+                                user: window.user || globalState.user
+                            })
+
                             const newMessages = response.data.new_messages
 
                 //             if (newMessages > 0) {
@@ -365,6 +370,8 @@
                         console.log(exp)
                         // swal.fire("Error", exp.message, "error")
                     }
+                    console.log('me+++++');
+
                 }
 
                 initHeaderApp()
