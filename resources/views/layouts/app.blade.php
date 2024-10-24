@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content="{{ csrf_token() }}"> 
         <title>@yield("title", "Eniyi.co")</title>
 
         <!-- <link rel="stylesheet" href="{{ asset('/css/all.css') }}" /> -->
@@ -29,7 +30,7 @@
 
     	<script>
     		const baseUrl = document.getElementById("baseUrl").value
-    		const appName = document.getElementById("appName").value    		
+    		const appName = document.getElementById("appName").value
     	</script>
         
         <script src="{{ asset('/js/script.js?v=' . time()) }}"></script>
@@ -103,6 +104,10 @@
                             if (response.data.status == "success") {
                                 // remove access token from local storage
                                 localStorage.removeItem(accessTokenKey)
+
+                                globalState.setState({
+                                    user: null
+                                })
                                 window.location.href = "/"
                                 // window.location.reload()
                             } else {
@@ -310,7 +315,7 @@
         <script type="text/babel" src="{{ asset('/components/Chat.js?v=' . time()) }}"></script>
         <link rel="stylesheet" href="{{ asset('/css/chat.css') }}" />
 
-        <script>
+        <script defer>
             async function onInit() {
                 const accessToken = localStorage.getItem(accessTokenKey)
                 if (accessToken) {
@@ -320,14 +325,18 @@
                             null,
                             {
                                 headers: {
-                                    Authorization: "Bearer " + accessToken
+                                    Authorization: "Bearer " + accessToken,
                                 }
                             }
                         )
 
                         if (response.data.status == "success") {
                             window.user = response.data.user
-                            // console.log("here", window.user)
+
+                            globalState.setState({
+                                user: window.user || globalState.user
+                            })
+
                             const newMessages = response.data.new_messages
 
                 //             if (newMessages > 0) {
@@ -361,6 +370,8 @@
                         console.log(exp)
                         // swal.fire("Error", exp.message, "error")
                     }
+                    console.log('me+++++');
+
                 }
 
                 initHeaderApp()

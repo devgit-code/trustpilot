@@ -14,6 +14,10 @@ use App\Http\Controllers\CategoryController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
 Route::group([
     "middleware" => ["web"]
 ], function () {

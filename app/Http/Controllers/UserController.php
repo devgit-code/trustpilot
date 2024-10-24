@@ -370,7 +370,6 @@ class UserController extends Controller
         $timestamp = strtotime($user->last_location_at);
 
         $current_timestamp = time();
-
         $difference = $current_timestamp - $timestamp;
 
         $twenty_four_hours_in_seconds = 24 * 60 * 60;

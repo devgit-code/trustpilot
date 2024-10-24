@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
@@ -52,42 +53,59 @@ Route::get("/admin", function () {
     return view("admin/index");
 });
 
-Route::get("/email-verification/{email}", function () {
-    return view("email-verification", [
-        "email" => request()->email
-    ]);
-});
 
-Route::get("/reset-password/{email}/{token}", function () {
-    return view("reset-password", [
-        "token" => request()->token,
-        "email" => request()->email
-    ]);
-})
-    ->name("password.reset");
+// Route::group([
+//     "middleware" => ["guard"]
+// ], function () {
+    Route::get("/email-verification/{email}", function () {
+        return view("auth.email-verification", [
+            "email" => request()->email
+        ]);
+    });
 
-Route::get("/forgot-password", function () {
-    return view("forgot-password");
-})->name("password.request");
+    Route::get("/reset-password/{email}/{token}", function () {
+        return view("auth.reset-password", [
+            "token" => request()->token,
+            "email" => request()->email
+        ]);
+    })
+        ->name("password.reset");
 
-Route::get("/change-password", function () {
-    return view("change-password");
-});
+    Route::get("/forgot-password", function () {
+        return view("auth.forgot-password");
+    })->name("password.request");
+
+    Route::get("/change-password", function () {
+        return view("auth.change-password");
+    });
+
+    Route::get("/login", function () {
+        return view("auth.login");
+    })->name('login');
+
+    Route::get("/register", function () {
+        return view("auth.register");
+    });
+// });
+
 
 Route::get("/profile", function () {
     return view("profile");
 });
 
-Route::get("/login", function () {
-    return view("login");
-});
-
-Route::get("/register", function () {
-    return view("register");
-});
-
-Route::get("/", [UserController::class, "home"]);
+Route::get("/", [UserController::class, "home"])->name('home');
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+Route::get('/clear-cache', function () {
+	Artisan::call('cache:clear');
+	Artisan::call('config:clear');
+	Artisan::call('config:cache');
+	Artisan::call('view:clear');
+	Artisan::call('route:clear');
+	Artisan::call('optimize');
+
+	return "Cache is cleared";
+});

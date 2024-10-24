@@ -1,5 +1,5 @@
 const accessTokenKey = "TrustPilotAccessToken"
-
+console.log('global++++')
 const globalState = {
     state: {
         user: null

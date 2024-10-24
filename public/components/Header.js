@@ -25,13 +25,13 @@ function Header() {
                 )
 
                 if (response.data.status == "success") {
-                    console.log("herere-------------")
                     const user = response.data.user
                     const newMessages = response.data.new_messages
 
                     globalState.setState({
                         user: user
                     })
+                    console.log("herere-------------")
 
                     if (newMessages > 0) {
                         document.getElementById("message-notification-badge").innerHTML = newMessages

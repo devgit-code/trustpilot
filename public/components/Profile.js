@@ -1,5 +1,4 @@
 function Profile() {
-
     const [state, setState] = React.useState(globalState.state)
     const [name, setName] = React.useState("")
     const [email, setEmail] = React.useState("")
@@ -8,9 +7,8 @@ function Profile() {
 
     React.useEffect(function () {
         globalState.listen(function (newState) {
+            console.log("profile+++", newState)
             setState(newState)
-            console.log("here+++", globalState)
-
             if (newState.user != null) {
                 setName(newState.user.name)
                 setEmail(newState.user.email)
@@ -66,7 +64,7 @@ function Profile() {
                         position: "relative",
                         left: "50%",
                         transform: "translateX(-50%)"
-                    }} src={ profileImage ? profileImage : 'img/default-user.png'} />
+                    }} src={ profileImage ? profileImage : 'img/user-profile.png'} />
 
                     <input type="file" name="profile_image" accept="image/*" />
                 </div>
